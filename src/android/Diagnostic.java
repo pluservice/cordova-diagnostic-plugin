@@ -54,7 +54,7 @@ import android.content.pm.PackageManager;
 import android.provider.Settings;
 
 
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 
 /**
  * Diagnostic plugin implementation for Android
@@ -700,9 +700,12 @@ public class Diagnostic extends CordovaPlugin{
                         //create a pending intent so the application is restarted after System.exit(0) was called.
                         // We use an AlarmManager to call this intent in 100ms
                         int mPendingIntentId = 223344;
-                        PendingIntent mPendingIntent = PendingIntent
-                                .getActivity(c, mPendingIntentId, mStartActivity,
-                                        PendingIntent.FLAG_CANCEL_CURRENT);
+                        PendingIntent mPendingIntent;
+                        if(Build.VERSION.SDK_INT >=23) {
+                            mPendingIntent=PendingIntent.getActivity(c, mPendingIntentId, mStartActivity,PendingIntent.FLAG_IMMUTABLE);
+                        } else{
+                            mPendingIntent=PendingIntent.getActivity(c, mPendingIntentId, mStartActivity,PendingIntent.FLAG_CANCEL_CURRENT);
+                        }
                         AlarmManager mgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
                         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
                         Log.i(TAG,"Killing application for cold restart");
